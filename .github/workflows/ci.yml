@@ -35,7 +35,7 @@ jobs:
         run: python -m pytest
 
       - name: Build Docker image
-        run: docker build -t github-profile-agent .
+        run: docker build --provenance=false -t github-profile-agent .
 
       - name: Log in to GitHub Container Registry
         if: github.event_name == 'push'
