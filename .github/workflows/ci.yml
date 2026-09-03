@@ -44,10 +44,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set image name
+        run: |
+          echo "IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
       - name: Tag Docker image
         run: |
-          docker tag github-profile-agent ghcr.io/${{ github.repository }}:latest
+          docker tag github-profile-agent $IMAGE_NAME:latest
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository }}:latest
+          docker push $IMAGE_NAME:latest
