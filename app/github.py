@@ -22,24 +22,40 @@ def get_user(username: str):
 
 
 def get_repositories(username: str):
-    url = f"{GITHUB_API}/users/{username}/repos"
+    repositories = []
+    page = 1
 
-    response = requests.get(
-        url,
-        params={
-            "per_page": 100,
-            "page": 1
-        },
-        timeout=TIMEOUT
-    )
+    while True:
+        url = f"{GITHUB_API}/users/{username}/repos"
 
-    if response.status_code == 404:
-        raise Exception("GitHub user not found")
+        response = requests.get(
+            url,
+            params={
+                "per_page": 100,
+                "page": page
+            },
+            timeout=TIMEOUT
+        )
 
-    if response.status_code == 403:
-        raise Exception("GitHub API rate limit exceeded")
+        if response.status_code == 404:
+            raise Exception("GitHub user not found")
 
-    if response.status_code != 200:
-        raise Exception("Failed to fetch repositories")
+        if response.status_code == 403:
+            raise Exception("GitHub API rate limit exceeded")
 
-    return response.json()
+        if response.status_code != 200:
+            raise Exception("Failed to fetch repositories")
+
+        data = response.json()
+
+        if not data:
+            break
+
+        repositories.extend(data)
+
+        if len(data) < 100:
+            break
+
+        page += 1
+
+    return repositories
